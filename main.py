@@ -59,6 +59,23 @@ async def receive_question(message: Message, state: FSMContext):
     await message.answer("✅ Your question has been sent! We'll get back to you as soon as possible.")
     await state.clear()
 
+
+@dp.message(F.text.startswith("/contact"))
+async def reply_to_user(message: Message):
+
+    args = message.text.split(maxsplit=2)
+    if len(args) < 3:
+        await message.answer("❗ Usage: /contact <telegram_id> <message>")
+        return
+
+    try:
+        user_id = int(args[1])
+        reply_text = args[2]
+        await bot.send_message(chat_id=user_id, text=f"📬 Support reply:\n\n{reply_text}")
+        await message.answer("✅ Reply sent successfully.")
+    except Exception as e:
+        await message.answer(f"⚠️ Failed to send message: {e}")
+
 # === Run ===
 if __name__ == "__main__":
     try:
