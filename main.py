@@ -12,7 +12,7 @@ load_dotenv()
 
 # === CONFIG ===
 BOT_TOKEN = os.getenv("BOT_TOKEN")
-ADMIN_TELEGRAM_ID = 786717735
+ADMIN_TELEGRAM_ID = os.getenv('ADMIN_TELEGRAM_ID')
 
 # === FSM States ===
 class SupportForm(StatesGroup):
