@@ -26,16 +26,30 @@ dp = Dispatcher(storage=MemoryStorage())
 
 @dp.message(CommandStart())
 async def start(message: Message, state: FSMContext):
-    await message.answer(
-        "👋 Welcome to Support!\n\nPlease describe your issue or question, and we'll get back to you as soon as possible.💬",
-        reply_markup=ReplyKeyboardRemove()
-    )
+    user_language = message.from_user.language_code
+    if user_language == 'en':
+        await message.answer(
+            "👋 Welcome to Support!\n\nPlease describe your issue or question, and we'll get back to you as soon as possible.💬",
+            reply_markup=ReplyKeyboardRemove()
+        )
+    elif user_language == 'ru' or user_language == 'uk':
+        await message.answer(
+            "👋 Добро пожаловать в поддержку!\n\nПожалуйста, опишите вашу проблему или вопрос, и мы свяжемся с вами как можно скорее.💬",
+            reply_markup=ReplyKeyboardRemove()
+        )
+    else:
+        await message.answer(
+            "👋 Welcome to Support!\n\nPlease describe your issue or question, and we'll get back to you as soon as possible.💬",
+            reply_markup=ReplyKeyboardRemove()
+        )
+
     await state.set_state(SupportForm.waiting_for_question)
 
 @dp.message(SupportForm.waiting_for_question)
 async def receive_question(message: Message, state: FSMContext):
     question = message.text
     user = message.from_user
+    user_language = message.from_user.language_code
 
     msg = (
         f"📨 New support message:\n\n"
@@ -45,7 +59,12 @@ async def receive_question(message: Message, state: FSMContext):
 
     try:
         await bot.send_message(chat_id=ADMIN_TELEGRAM_ID, text=msg)
-        await message.answer("✅ Your message has been sent! Support will reply soon.")
+        if user_language == 'en':
+            await message.answer("✅ Your message has been sent! Support will reply soon.")
+        elif user_language == 'ru' or user_language == 'uk':
+            await message.answer("✅ Ваше сообщение отправлено! Поддержка ответит скоро.")
+        else:
+            await message.answer("✅ Your message has been sent! Support will reply soon.")
     except Exception as e:
         await message.answer("⚠️ Failed to send message to support. Please try again later.")
 
@@ -61,7 +80,7 @@ async def reply_to_user(message: Message):
     try:
         user_id = int(args[1])
         reply_text = args[2]
-        await bot.send_message(chat_id=user_id, text=f"📬 Support reply:\n\n{reply_text}")
+        await bot.send_message(chat_id=user_id, text = f"📬 Ответ от поддержки:\n\n📬 Support reply:\n\n{reply_text}")
         await message.answer("✅ Reply sent successfully.")
     except Exception as e:
         await message.answer(f"⚠️ Failed to send message: {e}")
